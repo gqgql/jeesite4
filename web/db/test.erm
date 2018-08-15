@@ -11,8 +11,8 @@
 	</page_setting>
 	<category_index>0</category_index>
 	<zoom>1.0</zoom>
-	<x>0</x>
-	<y>99</y>
+	<x>131</x>
+	<y>31</y>
 	<default_color>
 		<r>128</r>
 		<g>128</g>
@@ -134,7 +134,7 @@
 			<connections>
 			</connections>
 			<display>false</display>
-			<creation_date>2014-10-22 17:21:43</creation_date>
+			<creation_date>2016-12-25 17:25:00</creation_date>
 			<model_property>
 				<name>Project Name</name>
 				<value></value>
@@ -178,8 +178,8 @@
 			<binary>false</binary>
 			<args></args>
 			<char_semantics>false</char_semantics>
-			<description>归属集团公司Code</description>
-			<logical_name>归属集团Code</logical_name>
+			<description>租户代码</description>
+			<logical_name>租户代码</logical_name>
 			<physical_name>corp_code</physical_name>
 			<type>varchar(n)</type>
 		</word>
@@ -194,8 +194,8 @@
 			<binary>false</binary>
 			<args></args>
 			<char_semantics>false</char_semantics>
-			<description>归属集团公司Name</description>
-			<logical_name>归属集团Name</logical_name>
+			<description>租户名称</description>
+			<logical_name>租户名称</logical_name>
 			<physical_name>corp_name</physical_name>
 			<type>nvarchar(n)</type>
 		</word>

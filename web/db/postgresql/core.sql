@@ -1,6 +1,8 @@
 
 /* Drop Tables */
 
+DROP TABLE IF EXISTS js_gen_table_column;
+DROP TABLE IF EXISTS js_gen_table;
 DROP TABLE IF EXISTS js_sys_company_office;
 DROP TABLE IF EXISTS js_sys_employee_post;
 DROP TABLE IF EXISTS js_sys_user_data_scope;
@@ -35,6 +37,58 @@ DROP TABLE IF EXISTS js_sys_role;
 
 
 /* Create Tables */
+
+-- 代码生成表
+CREATE TABLE js_gen_table
+(
+	table_name varchar(64) NOT NULL,
+	class_name varchar(100) NOT NULL,
+	comments varchar(500) NOT NULL,
+	parent_table_name varchar(64),
+	parent_table_fk_name varchar(64),
+	tpl_category varchar(200),
+	package_name varchar(500),
+	module_name varchar(30),
+	sub_module_name varchar(30),
+	function_name varchar(200),
+	function_name_simple varchar(50),
+	function_author varchar(50),
+	gen_base_dir varchar(1000),
+	options varchar(1000),
+	create_by varchar(64) NOT NULL,
+	create_date timestamp NOT NULL,
+	update_by varchar(64) NOT NULL,
+	update_date timestamp NOT NULL,
+	remarks varchar(500),
+	PRIMARY KEY (table_name)
+) WITHOUT OIDS;
+
+
+-- 代码生成表列
+CREATE TABLE js_gen_table_column
+(
+	id varchar(64) NOT NULL,
+	table_name varchar(64) NOT NULL,
+	column_name varchar(64) NOT NULL,
+	column_sort decimal(10),
+	column_type varchar(100) NOT NULL,
+	column_label varchar(50),
+	comments varchar(500) NOT NULL,
+	attr_name varchar(200) NOT NULL,
+	attr_type varchar(200) NOT NULL,
+	is_pk char(1),
+	is_null char(1),
+	is_insert char(1),
+	is_update char(1),
+	is_list char(1),
+	is_query char(1),
+	query_type varchar(200),
+	is_edit char(1),
+	show_type varchar(200),
+	options varchar(1000),
+	PRIMARY KEY (id)
+) WITHOUT OIDS;
+
 
 -- 行政区划
 CREATE TABLE js_sys_area
@@ -187,7 +241,7 @@ CREATE TABLE js_sys_dict_type
 (
 	id varchar(64) NOT NULL,
 	dict_name varchar(100) NOT NULL,
-	dict_type varchar(100) NOT NULL UNIQUE,
+	dict_type varchar(100) NOT NULL,
 	is_sys char(1) NOT NULL,
 	status char(1) DEFAULT '0' NOT NULL,
 	create_by varchar(64) NOT NULL,
@@ -477,9 +531,9 @@ CREATE TABLE js_sys_msg_push
 	push_return_msg_id varchar(200),
 	push_return_content text,
 	push_status char(1),
-	push_date date,
+	push_date timestamp,
 	read_status char(1),
-	read_date date,
+	read_date timestamp,
 	PRIMARY KEY (id)
 ) WITHOUT OIDS;
 
@@ -506,9 +560,9 @@ CREATE TABLE js_sys_msg_pushed
 	push_return_code varchar(200),
 	push_return_msg_id varchar(200),
 	push_status char(1),
-	push_date date,
+	push_date timestamp,
 	read_status char(1),
-	read_date date,
+	read_date timestamp,
 	PRIMARY KEY (id)
 ) WITHOUT OIDS;
 
@@ -734,6 +788,8 @@ CREATE TABLE js_sys_user_role
 
 /* Create Indexes */
 
+CREATE INDEX idx_gen_table_ptn ON js_gen_table (parent_table_name);
+CREATE INDEX idx_gen_table_column_tn ON js_gen_table_column (table_name);
 CREATE INDEX idx_sys_area_pc ON js_sys_area (parent_code);
 CREATE INDEX idx_sys_area_ts ON js_sys_area (tree_sort);
 CREATE INDEX idx_sys_area_status ON js_sys_area (status);
@@ -795,6 +851,7 @@ CREATE INDEX idx_sys_menu_tss ON js_sys_menu (tree_sorts);
 CREATE INDEX idx_sys_menu_sc ON js_sys_menu (sys_code);
 CREATE INDEX idx_sys_menu_is ON js_sys_menu (is_show);
 CREATE INDEX idx_sys_menu_mcs ON js_sys_menu (module_codes);
+CREATE INDEX idx_sys_menu_wt ON js_sys_menu (weight);
 CREATE INDEX idx_sys_module_status ON js_sys_module (status);
 CREATE INDEX idx_sys_msg_inner_cb ON js_sys_msg_inner (create_by);
 CREATE INDEX idx_sys_msg_inner_status ON js_sys_msg_inner (status);
@@ -861,6 +918,46 @@ CREATE INDEX idx_sys_user_cc ON js_sys_user (corp_code);
 
 /* Comments */
 
+COMMENT ON TABLE js_gen_table IS '代码生成表';
+COMMENT ON COLUMN js_gen_table.table_name IS '表名';
+COMMENT ON COLUMN js_gen_table.class_name IS '实体类名称';
+COMMENT ON COLUMN js_gen_table.comments IS '表说明';
+COMMENT ON COLUMN js_gen_table.parent_table_name IS '关联父表的表名';
+COMMENT ON COLUMN js_gen_table.parent_table_fk_name IS '本表关联父表的外键名';
+COMMENT ON COLUMN js_gen_table.tpl_category IS '使用的模板';
+COMMENT ON COLUMN js_gen_table.package_name IS '生成包路径';
+COMMENT ON COLUMN js_gen_table.module_name IS '生成模块名';
+COMMENT ON COLUMN js_gen_table.sub_module_name IS '生成子模块名';
+COMMENT ON COLUMN js_gen_table.function_name IS '生成功能名';
+COMMENT ON COLUMN js_gen_table.function_name_simple IS '生成功能名（简写）';
+COMMENT ON COLUMN js_gen_table.function_author IS '生成功能作者';
+COMMENT ON COLUMN js_gen_table.gen_base_dir IS '生成基础路径';
+COMMENT ON COLUMN js_gen_table.options IS '其它生成选项';
+COMMENT ON COLUMN js_gen_table.create_by IS '创建者';
+COMMENT ON COLUMN js_gen_table.create_date IS '创建时间';
+COMMENT ON COLUMN js_gen_table.update_by IS '更新者';
+COMMENT ON COLUMN js_gen_table.update_date IS '更新时间';
+COMMENT ON COLUMN js_gen_table.remarks IS '备注信息';
+COMMENT ON TABLE js_gen_table_column IS '代码生成表列';
+COMMENT ON COLUMN js_gen_table_column.id IS '编号';
+COMMENT ON COLUMN js_gen_table_column.table_name IS '表名';
+COMMENT ON COLUMN js_gen_table_column.column_name IS '列名';
+COMMENT ON COLUMN js_gen_table_column.column_sort IS '列排序（升序）';
+COMMENT ON COLUMN js_gen_table_column.column_type IS '类型';
+COMMENT ON COLUMN js_gen_table_column.column_label IS '列标签名';
+COMMENT ON COLUMN js_gen_table_column.comments IS '列备注说明';
+COMMENT ON COLUMN js_gen_table_column.attr_name IS '类的属性名';
+COMMENT ON COLUMN js_gen_table_column.attr_type IS '类的属性类型';
+COMMENT ON COLUMN js_gen_table_column.is_pk IS '是否主键';
+COMMENT ON COLUMN js_gen_table_column.is_null IS '是否可为空';
+COMMENT ON COLUMN js_gen_table_column.is_insert IS '是否插入字段';
+COMMENT ON COLUMN js_gen_table_column.is_update IS '是否更新字段';
+COMMENT ON COLUMN js_gen_table_column.is_list IS '是否列表字段';
+COMMENT ON COLUMN js_gen_table_column.is_query IS '是否查询字段';
+COMMENT ON COLUMN js_gen_table_column.query_type IS '查询方式';
+COMMENT ON COLUMN js_gen_table_column.is_edit IS '是否编辑字段';
+COMMENT ON COLUMN js_gen_table_column.show_type IS '表单类型';
+COMMENT ON COLUMN js_gen_table_column.options IS '其它生成选项';
 COMMENT ON TABLE js_sys_area IS '行政区划';
 COMMENT ON COLUMN js_sys_area.area_code IS '区域编码';
 COMMENT ON COLUMN js_sys_area.parent_code IS '父级编号';
@@ -897,8 +994,8 @@ COMMENT ON COLUMN js_sys_company.create_date IS '创建时间';
 COMMENT ON COLUMN js_sys_company.update_by IS '更新者';
 COMMENT ON COLUMN js_sys_company.update_date IS '更新时间';
 COMMENT ON COLUMN js_sys_company.remarks IS '备注信息';
-COMMENT ON COLUMN js_sys_company.corp_code IS '归属集团Code';
-COMMENT ON COLUMN js_sys_company.corp_name IS '归属集团Name';
+COMMENT ON COLUMN js_sys_company.corp_code IS '租户代码';
+COMMENT ON COLUMN js_sys_company.corp_name IS '租户名称';
 COMMENT ON COLUMN js_sys_company.extend_s1 IS '扩展 String 1';
 COMMENT ON COLUMN js_sys_company.extend_s2 IS '扩展 String 2';
 COMMENT ON COLUMN js_sys_company.extend_s3 IS '扩展 String 3';
@@ -955,8 +1052,8 @@ COMMENT ON COLUMN js_sys_dict_data.create_date IS '创建时间';
 COMMENT ON COLUMN js_sys_dict_data.update_by IS '更新者';
 COMMENT ON COLUMN js_sys_dict_data.update_date IS '更新时间';
 COMMENT ON COLUMN js_sys_dict_data.remarks IS '备注信息';
-COMMENT ON COLUMN js_sys_dict_data.corp_code IS '归属集团Code';
-COMMENT ON COLUMN js_sys_dict_data.corp_name IS '归属集团Name';
+COMMENT ON COLUMN js_sys_dict_data.corp_code IS '租户代码';
+COMMENT ON COLUMN js_sys_dict_data.corp_name IS '租户名称';
 COMMENT ON COLUMN js_sys_dict_data.extend_s1 IS '扩展 String 1';
 COMMENT ON COLUMN js_sys_dict_data.extend_s2 IS '扩展 String 2';
 COMMENT ON COLUMN js_sys_dict_data.extend_s3 IS '扩展 String 3';
@@ -1002,8 +1099,8 @@ COMMENT ON COLUMN js_sys_employee.create_date IS '创建时间';
 COMMENT ON COLUMN js_sys_employee.update_by IS '更新者';
 COMMENT ON COLUMN js_sys_employee.update_date IS '更新时间';
 COMMENT ON COLUMN js_sys_employee.remarks IS '备注信息';
-COMMENT ON COLUMN js_sys_employee.corp_code IS '归属集团Code';
-COMMENT ON COLUMN js_sys_employee.corp_name IS '归属集团Name';
+COMMENT ON COLUMN js_sys_employee.corp_code IS '租户代码';
+COMMENT ON COLUMN js_sys_employee.corp_name IS '租户名称';
 COMMENT ON TABLE js_sys_employee_post IS '员工与岗位关联表';
 COMMENT ON COLUMN js_sys_employee_post.emp_code IS '员工编码';
 COMMENT ON COLUMN js_sys_employee_post.post_code IS '岗位编码';
@@ -1083,8 +1180,8 @@ COMMENT ON COLUMN js_sys_log.user_agent IS '用户代理';
 COMMENT ON COLUMN js_sys_log.device_name IS '设备名称/操作系统';
 COMMENT ON COLUMN js_sys_log.browser_name IS '浏览器名称';
 COMMENT ON COLUMN js_sys_log.execute_time IS '执行时间';
-COMMENT ON COLUMN js_sys_log.corp_code IS '归属集团Code';
-COMMENT ON COLUMN js_sys_log.corp_name IS '归属集团Name';
+COMMENT ON COLUMN js_sys_log.corp_code IS '租户代码';
+COMMENT ON COLUMN js_sys_log.corp_name IS '租户名称';
 COMMENT ON TABLE js_sys_menu IS '菜单表';
 COMMENT ON COLUMN js_sys_menu.menu_code IS '菜单编码';
 COMMENT ON COLUMN js_sys_menu.parent_code IS '父级编号';
@@ -1255,8 +1352,8 @@ COMMENT ON COLUMN js_sys_office.create_date IS '创建时间';
 COMMENT ON COLUMN js_sys_office.update_by IS '更新者';
 COMMENT ON COLUMN js_sys_office.update_date IS '更新时间';
 COMMENT ON COLUMN js_sys_office.remarks IS '备注信息';
-COMMENT ON COLUMN js_sys_office.corp_code IS '归属集团Code';
-COMMENT ON COLUMN js_sys_office.corp_name IS '归属集团Name';
+COMMENT ON COLUMN js_sys_office.corp_code IS '租户代码';
+COMMENT ON COLUMN js_sys_office.corp_name IS '租户名称';
 COMMENT ON COLUMN js_sys_office.extend_s1 IS '扩展 String 1';
 COMMENT ON COLUMN js_sys_office.extend_s2 IS '扩展 String 2';
 COMMENT ON COLUMN js_sys_office.extend_s3 IS '扩展 String 3';
@@ -1288,8 +1385,8 @@ COMMENT ON COLUMN js_sys_post.create_date IS '创建时间';
 COMMENT ON COLUMN js_sys_post.update_by IS '更新者';
 COMMENT ON COLUMN js_sys_post.update_date IS '更新时间';
 COMMENT ON COLUMN js_sys_post.remarks IS '备注信息';
-COMMENT ON COLUMN js_sys_post.corp_code IS '归属集团Code';
-COMMENT ON COLUMN js_sys_post.corp_name IS '归属集团Name';
+COMMENT ON COLUMN js_sys_post.corp_code IS '租户代码';
+COMMENT ON COLUMN js_sys_post.corp_name IS '租户名称';
 COMMENT ON TABLE js_sys_role IS '角色表';
 COMMENT ON COLUMN js_sys_role.role_code IS '角色编码';
 COMMENT ON COLUMN js_sys_role.role_name IS '角色名称';
@@ -1304,8 +1401,8 @@ COMMENT ON COLUMN js_sys_role.create_date IS '创建时间';
 COMMENT ON COLUMN js_sys_role.update_by IS '更新者';
 COMMENT ON COLUMN js_sys_role.update_date IS '更新时间';
 COMMENT ON COLUMN js_sys_role.remarks IS '备注信息';
-COMMENT ON COLUMN js_sys_role.corp_code IS '归属集团Code';
-COMMENT ON COLUMN js_sys_role.corp_name IS '归属集团Name';
+COMMENT ON COLUMN js_sys_role.corp_code IS '租户代码';
+COMMENT ON COLUMN js_sys_role.corp_name IS '租户名称';
 COMMENT ON TABLE js_sys_role_data_scope IS '角色数据权限表';
 COMMENT ON COLUMN js_sys_role_data_scope.role_code IS '控制角色编码';
 COMMENT ON COLUMN js_sys_role_data_scope.ctrl_type IS '控制类型';
@@ -1352,8 +1449,8 @@ COMMENT ON COLUMN js_sys_user.create_date IS '创建时间';
 COMMENT ON COLUMN js_sys_user.update_by IS '更新者';
 COMMENT ON COLUMN js_sys_user.update_date IS '更新时间';
 COMMENT ON COLUMN js_sys_user.remarks IS '备注信息';
-COMMENT ON COLUMN js_sys_user.corp_code IS '归属集团Code';
-COMMENT ON COLUMN js_sys_user.corp_name IS '归属集团Name';
+COMMENT ON COLUMN js_sys_user.corp_code IS '租户代码';
+COMMENT ON COLUMN js_sys_user.corp_name IS '租户名称';
 COMMENT ON COLUMN js_sys_user.extend_s1 IS '扩展 String 1';
 COMMENT ON COLUMN js_sys_user.extend_s2 IS '扩展 String 2';
 COMMENT ON COLUMN js_sys_user.extend_s3 IS '扩展 String 3';

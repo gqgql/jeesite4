@@ -1,7 +1,6 @@
-<% var productName = @Global.getConfig('productName'); %>
 <nav class="navbar navbar-static-top">
-	<div class="logo" data-toggle="push-menu" title="${productName}">
-		<b>${productName}</b>
+	<div class="logo" data-toggle="push-menu">
+		<b>${@Global.getConfig('productName')}</b>
 		<small>&nbsp; &nbsp;<i class="fa fa-bars"></i></small>
 	</div>
 	<%/*<!--%><a href="javascript:" class="sidebar-toggle" data-toggle="push-menu" role="button">
@@ -15,12 +14,12 @@
 			<% } %>
 			<li><a href="javascript:" id="fullScreen" title="${text('全屏')}"><i class="fa fa-arrows-alt"></i></a></li>
 			<li><a href="javascript:" id="switchSkin" title="${text('切换主题')}" style="margin-top:-1px;"><i class="fa fa-dashboard"></i></a></li>
-			<% include('/modules/sys/sysIndex/topMenuLang.html'){} %>
-			<% include('/modules/sys/sysIndex/topMenuOnline.html'){} %>
-			<% //include('/modules/sys/sysIndex/topMenuMsg.html'){} %>
-			<% //include('/modules/sys/sysIndex/topMenuNotify.html'){} %>
-			<% //include('/modules/sys/sysIndex/topMenuTask.html'){} %>
-			<% include('/modules/sys/sysIndex/topMenuUser.html'){} %>
+			<% include('topMenuLang.html'){} %>
+			<% include('topMenuOnline.html'){} %>
+			<% include('topMenuMsg.html'){} %>
+			<% //include('topMenuNotify.html'){} %>
+			<% //include('topMenuTask.html'){} %>
+			<% include('topMenuUser.html'){} %>
 		</ul>
 	</div>
 </nav>

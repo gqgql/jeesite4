@@ -169,15 +169,7 @@ public class LoginController extends BaseController{
 
 		// 非授权异常，登录失败，验证码加1。
 		if (!UnauthorizedException.class.getName().equals(exception)){
-//			// 如果使用了集团用户模式，则获取集团Code
-//			String corpCode = null;
-//			if (Global.isUseCorpModel()){
-//				corpCode = (String)paramMap.get("corpCode");
-//				if (StringUtils.isBlank(corpCode)){
-//					throw new AuthenticationException("msg:请选择您要登录的集团公司.");
-//				}
-//			}
-			model.addAttribute("isValidCodeLogin", BaseAuthorizingRealm.isValidCodeLogin(username, /*corpCode, */(String)paramMap.get("deviceType"), "failed"));
+			model.addAttribute("isValidCodeLogin", BaseAuthorizingRealm.isValidCodeLogin(username, (String)paramMap.get("deviceType"), "failed"));
 		}
 		
 		//获取当前会话对象
@@ -235,14 +227,11 @@ public class LoginController extends BaseController{
 			return REDIRECT + adminPath + "/login";
 		}
 		model.addAttribute("user", user); // 设置当前用户信息
-		
-		// 登录成功后，验证码计算器清零
-		BaseAuthorizingRealm.isValidCodeLogin(loginInfo.getId(), /*loginInfo.getParam("corpCode"), */loginInfo.getParam("deviceType"), "success");
 
 		//获取当前会话对象
 		Session session = UserUtils.getSession();
 		
-		// 设置共享SessionId的Cookie值，睿思BI使用。
+		// 设置共享SessionId的Cookie值（第三方系统使用）
 		String cookieName = Global.getProperty("session.shareSessionIdCookieName");
 		if (StringUtils.isNotBlank(cookieName)){
 			CookieUtils.setCookie((HttpServletResponse)response, cookieName, (String)session.getId());
@@ -302,7 +291,7 @@ public class LoginController extends BaseController{
 	}
 	
 	/**
-	 * 获取当前用户权限字符串数据
+	 * 获取当前用户权限字符串数据（移动端用）
 	 */
 	@RequiresPermissions("user")
 	@RequestMapping(value = "authInfo")
@@ -312,12 +301,15 @@ public class LoginController extends BaseController{
 	}
 
 	/**
-	 * 获取当前用户菜单数据
+	 * 获取当前用户菜单数据（移动端用）
 	 */
 	@RequiresPermissions("user")
 	@RequestMapping(value = "menuTree")
 	@ResponseBody
 	public List<Menu> menuTree(String parentCode) {
+		if (StringUtils.isNotBlank(parentCode)){
+			return UserUtils.getMenuListByParentCode(parentCode);
+		}
 		return UserUtils.getMenuTree();
 	}
 

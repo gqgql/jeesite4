@@ -1,6 +1,8 @@
 
 /* Drop Tables */
 
+IF OBJECT_ID('[js_gen_table_column]') IS NOT NULL DROP TABLE [js_gen_table_column];
+IF OBJECT_ID('[js_gen_table]') IS NOT NULL DROP TABLE [js_gen_table];
 IF OBJECT_ID('[js_sys_company_office]') IS NOT NULL DROP TABLE [js_sys_company_office];
 IF OBJECT_ID('[js_sys_employee_post]') IS NOT NULL DROP TABLE [js_sys_employee_post];
 IF OBJECT_ID('[js_sys_user_data_scope]') IS NOT NULL DROP TABLE [js_sys_user_data_scope];
@@ -35,6 +37,58 @@ IF OBJECT_ID('[js_sys_role]') IS NOT NULL DROP TABLE [js_sys_role];
 
 
 /* Create Tables */
+
+-- 代码生成表
+CREATE TABLE [js_gen_table]
+(
+	[table_name] varchar(64) NOT NULL,
+	[class_name] varchar(100) NOT NULL,
+	[comments] nvarchar(500) NOT NULL,
+	[parent_table_name] varchar(64),
+	[parent_table_fk_name] varchar(64),
+	[tpl_category] varchar(200),
+	[package_name] varchar(500),
+	[module_name] varchar(30),
+	[sub_module_name] varchar(30),
+	[function_name] nvarchar(200),
+	[function_name_simple] nvarchar(50),
+	[function_author] nvarchar(50),
+	[gen_base_dir] nvarchar(1000),
+	[options] nvarchar(1000),
+	[create_by] varchar(64) NOT NULL,
+	[create_date] datetime NOT NULL,
+	[update_by] varchar(64) NOT NULL,
+	[update_date] datetime NOT NULL,
+	[remarks] nvarchar(500),
+	PRIMARY KEY ([table_name])
+);
+
+
+-- 代码生成表列
+CREATE TABLE [js_gen_table_column]
+(
+	[id] varchar(64) NOT NULL,
+	[table_name] varchar(64) NOT NULL,
+	[column_name] varchar(64) NOT NULL,
+	[column_sort] decimal(10),
+	[column_type] varchar(100) NOT NULL,
+	[column_label] nvarchar(50),
+	[comments] nvarchar(500) NOT NULL,
+	[attr_name] varchar(200) NOT NULL,
+	[attr_type] varchar(200) NOT NULL,
+	[is_pk] char(1),
+	[is_null] char(1),
+	[is_insert] char(1),
+	[is_update] char(1),
+	[is_list] char(1),
+	[is_query] char(1),
+	[query_type] varchar(200),
+	[is_edit] char(1),
+	[show_type] varchar(200),
+	[options] nvarchar(1000),
+	PRIMARY KEY ([id])
+);
+
 
 -- 行政区划
 CREATE TABLE [js_sys_area]
@@ -187,7 +241,7 @@ CREATE TABLE [js_sys_dict_type]
 (
 	[id] varchar(64) NOT NULL,
 	[dict_name] nvarchar(100) NOT NULL,
-	[dict_type] varchar(100) NOT NULL UNIQUE,
+	[dict_type] varchar(100) NOT NULL,
 	[is_sys] char(1) NOT NULL,
 	[status] char(1) DEFAULT '0' NOT NULL,
 	[create_by] varchar(64) NOT NULL,
@@ -477,9 +531,9 @@ CREATE TABLE [js_sys_msg_push]
 	[push_return_msg_id] varchar(200),
 	[push_return_content] text,
 	[push_status] char(1),
-	[push_date] date,
+	[push_date] datetime,
 	[read_status] char(1),
-	[read_date] date,
+	[read_date] datetime,
 	PRIMARY KEY ([id])
 );
 
@@ -506,9 +560,9 @@ CREATE TABLE [js_sys_msg_pushed]
 	[push_return_code] varchar(200),
 	[push_return_msg_id] varchar(200),
 	[push_status] char(1),
-	[push_date] date,
+	[push_date] datetime,
 	[read_status] char(1),
-	[read_date] date,
+	[read_date] datetime,
 	PRIMARY KEY ([id])
 );
 
@@ -734,6 +788,8 @@ CREATE TABLE [js_sys_user_role]
 
 /* Create Indexes */
 
+CREATE INDEX [idx_gen_table_ptn] ON [js_gen_table] ([parent_table_name]);
+CREATE INDEX [idx_gen_table_column_tn] ON [js_gen_table_column] ([table_name]);
 CREATE INDEX [idx_sys_area_pc] ON [js_sys_area] ([parent_code]);
 CREATE INDEX [idx_sys_area_ts] ON [js_sys_area] ([tree_sort]);
 CREATE INDEX [idx_sys_area_status] ON [js_sys_area] ([status]);
@@ -795,6 +851,7 @@ CREATE INDEX [idx_sys_menu_tss] ON [js_sys_menu] ([tree_sorts]);
 CREATE INDEX [idx_sys_menu_sc] ON [js_sys_menu] ([sys_code]);
 CREATE INDEX [idx_sys_menu_is] ON [js_sys_menu] ([is_show]);
 CREATE INDEX [idx_sys_menu_mcs] ON [js_sys_menu] ([module_codes]);
+CREATE INDEX [idx_sys_menu_wt] ON [js_sys_menu] ([weight]);
 CREATE INDEX [idx_sys_module_status] ON [js_sys_module] ([status]);
 CREATE INDEX [idx_sys_msg_inner_cb] ON [js_sys_msg_inner] ([create_by]);
 CREATE INDEX [idx_sys_msg_inner_status] ON [js_sys_msg_inner] ([status]);

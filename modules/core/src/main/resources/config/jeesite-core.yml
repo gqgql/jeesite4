@@ -1,59 +1,12 @@
 # 温馨提示：不建议直接修改此文件，为了平台升级方便，建议将需要修改的参数值，复制到jeesite.yml里进行覆盖该参数值。
 
 #============================#
-#===== Project settings =====#
-#============================#
-
-# 产品或项目名称、版本、版权年份
-productName: JeeSite Demo
-productVersion: V4.0
-copyrightYear: 2018
-
-# 软件提供商公司或个人名称
-companyName: ThinkGem
-
-#是否演示模式
-demoMode: false
-
-#============================#
 #===== Database sttings =====#
 #============================#
 
 # 数据库连接
 jdbc: 
   
-#  # Mysql 数据库配置
-#  type: mysql
-#  driver: com.mysql.jdbc.Driver
-#  url: jdbc:mysql://127.0.0.1:3306/jeesite?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
-#  username: root
-#  password: 123456
-#  testSql: SELECT 1
-#
-#  # Oracle 数据库配置
-#  type: oracle
-#  driver: oracle.jdbc.driver.OracleDriver
-#  url: jdbc:oracle:thin:@127.0.0.1:1521/orcl
-#  username: jeesite
-#  password: jeesite
-#  testSql: SELECT 1 FROM DUAL
-#
-#  # Sql Server 数据库配置
-#  type: mssql
-#  driver: net.sourceforge.jtds.jdbc.Driver
-#  url: jdbc:jtds:sqlserver://127.0.0.1:1433/jeesite
-#  username: jeesite
-#  password: jeesite
-#  testSql: SELECT 1
-#  
-#  # PostgreSql 数据库配置（注意：一定要创建的schema与username相同，否则将找不到数据表字典信息）
-#  type: postgresql
-#  driver: org.postgresql.Driver
-#  url: jdbc:postgresql://127.0.0.1:5432/jeesite
-#  username: jeesite
-#  password: jeesite
-#  testSql: SELECT 1
-
   # 连接信息加密
   encrypt:
   
@@ -90,6 +43,10 @@ jdbc:
 #      init: 1
 #      minIdle: 3
 #      maxActive: 20
+  
+  # JTA 分布式事务（v4.0.4+）
+  jta:
+    enabled: false
 
   # 表名前缀
   tablePrefix: js_
@@ -101,6 +58,7 @@ jdbc:
   
 # Redis 配置
 redis: 
+  enabled: false
   
   # Redis 连接参数
   host: 127.0.0.1
@@ -116,7 +74,7 @@ redis:
     maxIdle: 3
     maxTotal: 20
 
-  # 是否启用Redis系统缓存及会话
+  # 是否启用Redis系统缓存及会话（专业版）
   cacheAndSession: false
   
   # 定义Key的前缀标识
@@ -195,10 +153,17 @@ user:
       remarks: ""
     }]
 
-  # 集团模式（多公司、多租户、SAAS模式）
+  # 多租户模式（SAAS模式）（专业版）
   useCorpModel: false
-
-# 任务调度
+  
+  # 自助账号服务
+  account:
+    # 注册用户
+    registerUser:
+      enabled: false
+      userTypes: 0, 1
+  
+# 任务调度（个人版+）
 job:
 
   # 是否自动启动任务调度（可关闭）
@@ -215,6 +180,7 @@ job:
   # 任务调度集群设置
   jobStore:
     isClustered: true
+    dataSourceName: job
     clusterCheckinInterval: 1000
 
 # 内容管理
@@ -222,7 +188,7 @@ cms:
 
   # 内容管理主站点编码
   mainSiteCode: main
-
+  
 #============================#
 #==== Framework settings ====#
 #============================#
@@ -238,14 +204,14 @@ shiro:
   logoutUrl: ${shiro.loginUrl}
   successUrl: ${adminPath}/index
 
-  # CAS 相关配置
-#  casServerUrl: http://192.168.1.3:8080/cas
-#  casClientUrl: http://192.168.1.3:8180/jeesite
+#  # Jasig CAS 相关配置
+#  casServerUrl: http://127.0.0.1:8981/cas
+#  casClientUrl: http://127.0.0.1:8980/js
 #  loginUrl: ${shiro.casServerUrl}?service=${shiro.casClientUrl}${adminPath}/login-cas
 #  logoutUrl: ${shiro.casServerUrl}/logout?service=${shiro.loginUrl}
 #  successUrl: ${shiro.casClientUrl}${adminPath}/index
 
-  # SSO 登录相关配置
+  # 简单 SSO 登录相关配置
   sso:
   
     # 如果启用/sso/{username}/{token}单点登录，请修改此安全key并与单点登录系统key一致。
@@ -260,6 +226,9 @@ shiro:
     # 登录提交信息安全Key，加密用户名、密码、验证码，后再提交（key设置为3个，用逗号分隔）
     secretKey: thinkgem,jeesite,com
 
+  # 允许的请求方法设定，解决安全审计问题
+  allowRequestMethods: GET,POST
+  
   # 是否允许账号多地登录，如果设置为false，同一个设备类型的其它地点登录的相同账号被踢下线
   isAllowMultiAddrLogin: true
   
@@ -380,7 +349,8 @@ web:
         ${adminPath}/sys/online/count,
         ${adminPath}/**/treeData,
         ${adminPath}/file/**,
-        ${adminPath}/tags/*
+        ${adminPath}/tags/*,
+        ${adminPath}/msg/**
     
     # 前台自动切换到手机视图拦截器
     mobile:
@@ -395,6 +365,11 @@ web:
   # 静态文件后缀，排除的url路径，指定哪些uri路径不进行静态文件过滤。
   staticFileExcludeUri: /druid/
 
+  # 自定义正则表达式验证（主键、登录名）
+  validator:
+    id: '[a-zA-Z0-9_\-/\u4e00-\u9fa5]{0,64}'
+    user.loginCode: '[a-zA-Z0-9_\u4e00-\u9fa5]{4,20}'
+   
 # 错误页面500.html是否输出错误信息（正式环境，为提供安全性可设置为false）
 error:
   page:
@@ -406,7 +381,7 @@ error:
 
 file:
 
-  # 文件上传跟路径，设置路径中不允许包含“userfiles”，在指定目录中系统会自动创建userfiles目录，如果不设置默认为contextPath路径
+  # 文件上传根路径，设置路径中不允许包含“userfiles”，在指定目录中系统会自动创建userfiles目录，如果不设置默认为contextPath路径
 #  baseDir: D:/jeesite
 
   # 上传文件的相对路径（支持：yyyy, MM, dd, HH, mm, ss, E）
@@ -430,17 +405,22 @@ file:
 #===== Message settings =====#
 #============================#
 
+# 消息提醒中心（专业版）
 msg:
 
   # 是否开启实时发送消息（保存消息后立即检查未读消息并发送），分布式部署下请单独配置消息发送服务，不建议开启此选项。
   realtime:
     # 是否开启
     enabled: true
-    # 消息发送任务Bean名称
-    sendTaskBeanName: msgLocalSendTask
+    # 消息实时推送任务Bean名称
+    beanName: msgLocalPushTask
+  
+  # 推送失败次数，如果推送次数超过了设定次数，仍不成功，则放弃并保存到历史
+  pushFailNumber: 3
 
   # 邮件发送参数
   email:
+    beanName: emailSendService
     fromAddress: jeesite_demo@163.com
     fromPassword: jeesitedemo1234
     fromHostName: smtp.163.com
@@ -449,12 +429,15 @@ msg:
 
   # 短信网关
   sms:
-    url: http://host:port/msg/sendSms
-    data: account=demo&pswd=demo&product=
-    suffix: 【JeeSite】
+    beanName: smsSendService
+    url: http://lehuo520.cn/a/sms/api
+    data: username=jeesite&password=jeesite.com
+    prefix: 【JeeSite】
+    suffix: ~
 
   # 微信相关
   weixin:
+    beanName: weixinSendService
     #微信应用ID
     appid: ~
     #微信应用密钥
